@@ -1,5 +1,7 @@
 package model.entities;
 
+import model.exceptions.DomainException;
+
 import javax.lang.model.util.SimpleAnnotationValueVisitor6;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -12,7 +14,10 @@ public class Reservation {
 
     private static SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
-    public Reservation(Integer roomNumber, Date checkIn, Date checkOut) {
+    public Reservation(Integer roomNumber, Date checkIn, Date checkOut){
+        if(!checkOut.after(checkIn)){
+            throw new DomainException("check-out date must be after check-in");
+        }
         this.roomNumber = roomNumber;
         this.checkIn = checkIn;
         this.checkOut = checkOut;
@@ -40,17 +45,17 @@ public class Reservation {
 
     }
 
-    public String updateDates(Date checkIn, Date checkOut){
+    public void updateDates(Date checkIn, Date checkOut){
         Date now = new Date();
         if(checkIn.before(now) || checkOut.before(now)){
-            return "Reservation dates for update must be future";
+            throw new DomainException("Reservation dates for update must be future");
         }
         if(!checkOut.after(checkIn)){
-            return "check-out date must be after check-in";
+            throw new DomainException("check-out date must be after check-in");
         }
         this.checkIn = checkIn;
         this.checkOut = checkIn;
-        return null;
+
     }
 
     @Override
